@@ -309,6 +309,8 @@ EOF
       TS_AUTH_ONCE: "true"
       TS_ACCEPT_DNS: "false"
       TS_USERSPACE: "false"
+      # iptables o nftables según el sistema (Ubuntu 26.04 ya no trae iptables clásico)
+      TS_DEBUG_FIREWALL_MODE: auto
       TS_SERVE_CONFIG: /var/run/tailscale/serve.json
     volumes:
       - $DIR/tailscale:/var/lib/tailscale
