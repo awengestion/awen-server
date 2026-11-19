@@ -113,8 +113,8 @@ verificar_sistema() {
         *) error "Sistema no soportado (${PRETTY_NAME:-desconocido}). AWEN se instala en Ubuntu o Debian." ;;
     esac
     case "${ID}:${VERSION_ID:-}" in
-        ubuntu:22.04|ubuntu:24.04|debian:12|debian:13) ;;
-        *) aviso "${PRETTY_NAME} no está probado (sí Ubuntu 22.04/24.04 y Debian 12/13). Se sigue igual." ;;
+        ubuntu:22.04|ubuntu:24.04|ubuntu:26.04|debian:12|debian:13) ;;
+        *) aviso "${PRETTY_NAME} no está probado (sí Ubuntu 22.04/24.04/26.04 y Debian 12/13). Se sigue igual." ;;
     esac
     OS_ID="$ID"
     OS_CODENAME="${VERSION_CODENAME:-}"
@@ -150,6 +150,8 @@ instalar_docker() {
 
     info "Instalando Docker desde el repositorio oficial..."
     export DEBIAN_FRONTEND=noninteractive
+    # needrestart (Ubuntu) llena la pantalla con su resumen después de cada apt
+    export NEEDRESTART_SUSPEND=1
     apt-get update -qq
     apt-get install -y -qq ca-certificates curl >/dev/null
     install -m 0755 -d /etc/apt/keyrings
@@ -159,7 +161,7 @@ instalar_docker() {
         > /etc/apt/sources.list.d/docker.list
     apt-get update -qq
     apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-compose-plugin >/dev/null
-    systemctl enable --now docker >/dev/null
+    systemctl enable --now docker >/dev/null 2>&1
 }
 
 revisar_puertos() {
@@ -427,8 +429,8 @@ mostrar_acceso() {
         echo
         echo "    Código de alta: $(tr -d '[:space:]' < "$DIR/awen/CODIGO-ALTA.txt")"
         echo
-        echo "    En el primer puesto: instalar AWEN, elegir \"Puesto de trabajo\", ingresar"
-        echo "    la dirección de arriba y este código para crear el administrador."
+        echo "    En el primer puesto: instalar AWEN, elegir \"Puesto\", conectarlo a la"
+        echo "    dirección de arriba e ingresar este código para crear el administrador."
         echo "    Se puede volver a ver con: sudo cat $DIR/awen/CODIGO-ALTA.txt"
     fi
     if [ -f /etc/systemd/system/awen-actualizar.timer ] && systemctl is-enabled --quiet awen-actualizar.timer 2>/dev/null; then
